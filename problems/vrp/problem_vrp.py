@@ -16,6 +16,7 @@ class CVRP(object):
 
     @staticmethod
     def get_costs(dataset, pi):
+
         batch_size, graph_size = dataset['demand'].size()
         # Check that tours are valid, i.e. contain 0 to n -1
         sorted_pi = pi.data.sort(1)[0]
@@ -81,6 +82,63 @@ class CVRP(object):
 
         return beam_search(state, beam_size, propose_expansions)
 
+    
+
+class CVRP_BUS(CVRP):
+
+    NAME = 'cvrp_bus'  # Capacitated Vehicle Routing Problem
+
+    @staticmethod
+    def get_costs(dataset, pi):
+        batch_size, graph_size = dataset['demand'].size()
+        # Check that tours are valid, i.e. contain 0 to n -1
+        sorted_pi = pi.data.sort(1)[0]
+
+        # Sorting it should give all zeros at front and then 1...n
+        assert (
+            torch.arange(1, graph_size + 1, out=pi.data.new()).view(1, -1).expand(batch_size, graph_size) ==
+            sorted_pi[:, -graph_size:]
+        ).all() and (sorted_pi[:, :-graph_size] == 0).all(), "Invalid tour"
+
+        # Visiting depot resets capacity so we add demand = -capacity (we make sure it does not become negative)
+        demand_with_depot = torch.cat(
+            (
+                torch.full_like(dataset['demand'][:, :1], -CVRP.VEHICLE_CAPACITY),
+                dataset['demand']
+            ),
+            1
+        )
+        d = demand_with_depot.gather(1, pi)
+
+        used_cap = torch.zeros_like(dataset['demand'][:, 0])
+        for i in range(pi.size(1)):
+            used_cap += d[:, i]  # This will reset/make capacity negative if i == 0, e.g. depot visited
+            # Cannot use less than 0
+            used_cap[used_cap < 0] = 0
+            assert (used_cap <= CVRP.VEHICLE_CAPACITY + 1e-5).all(), "Used more than capacity"
+
+        # Gather dataset in order of tour
+        loc_with_depot = torch.cat((dataset['depot'][:, None, :], dataset['loc']), 1)
+        d = loc_with_depot.gather(1, pi[..., None].expand(*pi.size(), loc_with_depot.size(-1)))
+
+        # Length is distance (L2-norm of difference) of each next location to its prev and of first and last to depot
+        cost_VRP = (
+            (d[:, 1:] - d[:, :-1]).norm(p=2, dim=2).sum(1)
+            + (d[:, 0] - dataset['depot']).norm(p=2, dim=1)  # Depot to first
+            + (d[:, -1] - dataset['depot']).norm(p=2, dim=1)  # Last to depot, will be 0 if depot is last
+        )
+
+        # Cost for number of buses 
+        num_zeros = (sorted_pi==0).sum(axis=1) # (batch_size,)
+        num_buses = num_zeros+(pi[:,-1]!=0) # (batch_size,)
+        
+
+        # some reasonalb coefficient c balancing the cost of VRP length and the cost of # of buses.
+        c=0.5
+
+        return (1-c)*cost_VRP + c*num_buses, None
+
+   
 
 class SDVRP(object):
 
