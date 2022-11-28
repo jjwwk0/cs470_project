@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 import torch
 import os
 import pickle
+import numpy as np
 
 from problems.vrp.state_cvrp import StateCVRP
 from problems.vrp.state_sdvrp import StateSDVRP
@@ -134,11 +135,15 @@ class CVRP_BUS(CVRP):
         
 
         # some reasonalb coefficient c balancing the cost of VRP length and the cost of # of buses.
-        c=0.5
+        c=0.2
 
-        return (1-c)*cost_VRP + c*num_buses, None
+        return (1-cost_VRP)* + c*num_buses, None
 
-   
+    @staticmethod
+    def make_dataset(*args, **kwargs):
+        return CVRP_BUSDataset(*args, **kwargs)
+    
+
 
 class SDVRP(object):
 
@@ -252,6 +257,45 @@ class VRPDataset(Dataset):
                     'depot': torch.FloatTensor(2).uniform_(0, 1)
                 }
                 for i in range(num_samples)
+            ]
+
+        self.size = len(self.data)
+
+    def __len__(self):
+        return self.size
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+
+
+class CVRP_BUSDataset(Dataset):
+    def __init__(self, filename=None, size=50, num_samples=1000000, offset=0, distribution=None):
+        super(CVRP_BUSDataset, self).__init__()
+
+        self.data_set = []
+        if filename is not None:
+            assert os.path.splitext(filename)[1] == '.pkl'
+
+            with open(filename, 'rb') as f:
+                data = pickle.load(f)
+            self.data = [make_instance(args) for args in data[offset:offset+num_samples]]
+
+        else:
+
+            CAPACITY = 45
+            population = [1975132/4827184,2361745/4827184, 448404/4827184, 36683/4827184, 5220/4827184]    
+
+
+            self.data = [
+                {
+                    'loc' : torch.FloatTensor(size, 2).uniform_(0, 1),
+                    'demand' : torch.tensor(
+                        np.random.choice([1,2,3,4,5],size=size, 
+                                                replace=True, p=population) / CAPACITY,
+                        dtype = torch.float32),
+                    'depot' : torch.full(size=(2,),fill_value=0.5),
+                }
+            for i in range(num_samples)
             ]
 
         self.size = len(self.data)
