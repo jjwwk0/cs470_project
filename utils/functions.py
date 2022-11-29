@@ -8,7 +8,7 @@ from tqdm import tqdm
 from multiprocessing.dummy import Pool as ThreadPool
 from multiprocessing import Pool
 import torch.nn.functional as F
-
+from sklearn.cluster import KMeans
 
 def load_problem(name):
     from problems import TSP, CVRP, SDVRP, OP, PCTSPDet, PCTSPStoch, CVRP_BUS
@@ -208,3 +208,17 @@ def sample_many(inner_func, get_cost_func, input, batch_rep=1, iter_rep=1):
     minpis = pis[torch.arange(pis.size(0), out=argmincosts.new()), argmincosts]
 
     return minpis, mincosts
+
+
+def cluster_pop(pop, N, pop_demand):
+    kmeans = KMeans(n_clusters=N, algorithm="full", init='k-means++').fit(pop)
+    cen = kmeans.cluster_centers_
+    w = np.zeros(N, dtype=np.int64)
+    for i in range(N):
+        w[i] = np.sum(pop_demand[kmeans.labels_ == i])
+    labels = kmeans.predict(pop)
+    
+    return cen, labels, w
+
+def generate_sbrp(pop):
+    cen, labels, w = cluster_pop(pop, 20)

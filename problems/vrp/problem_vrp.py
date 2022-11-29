@@ -7,6 +7,7 @@ import numpy as np
 from problems.vrp.state_cvrp import StateCVRP
 from problems.vrp.state_sdvrp import StateSDVRP
 from utils.beam_search import beam_search
+from utils.functions import cluster_pop
 
 
 class CVRP(object):
@@ -130,18 +131,39 @@ class CVRP_BUS(CVRP):
         )
 
         # Cost for number of buses 
-        num_zeros = (sorted_pi==0).sum(axis=1) # (batch_size,)
-        num_buses = num_zeros+(pi[:,-1]!=0) # (batch_size,)
         
+        z=torch.zeros(pi.size(0)).cuda() #first last zero idx
+        assert z.is_cuda
+        for i in range(pi.size(1)-1):
+            if i==0:
+                continue
+            not_allocated = (z==0)
+            continuous_zero = torch.logical_and(pi[:,i]==pi[:,i+1], pi[:,i]==0)
+            z[torch.logical_and(continuous_zero,not_allocated)]=i
+        z[torch.logical_and(z==0,pi[:,-1]==0)]=pi.size(1)-1 
+        z[z==0]=pi.size(1)
+        num_dummy_zeros = pi.size(1)-z
+        # routes = [r[r!=0] for r in np.split(pi.cpu().numpy(), np.where(pi==0)[0]) if (r != 0).any()]
+        
+        # num_buses = len(routes)
+        num_zeros = (sorted_pi==0).sum(axis=1) # (batch_size,)
+        num_buses = num_zeros-num_dummy_zeros + 1
+        
+        # print(pi[0])
+        # print(cost_VRP[0])
+        # print(num_buses[0])
 
-        # some reasonalb coefficient c balancing the cost of VRP length and the cost of # of buses.
+        # some reasonable coefficient c balancing the cost of VRP length and the cost of # of buses.
         c=0.2
 
-        return (1-cost_VRP)* + c*num_buses, None
+        cost = (1-c)*cost_VRP + c*num_buses
+        # print(cost[0])
+        return cost, None
 
     @staticmethod
     def make_dataset(*args, **kwargs):
-        return CVRP_BUSDataset(*args, **kwargs)
+        return VRPDataset(*args,**kwargs)
+        # return CVRP_BUSDataset(*args, **kwargs)
     
 
 
@@ -281,22 +303,26 @@ class CVRP_BUSDataset(Dataset):
             self.data = [make_instance(args) for args in data[offset:offset+num_samples]]
 
         else:
-
+            
             CAPACITY = 45
-            population = [1975132/4827184,2361745/4827184, 448404/4827184, 36683/4827184, 5220/4827184]    
 
+            pop_size=200    
+            pop_dist = [1975132/4827184,2361745/4827184, 448404/4827184, 36683/4827184, 5220/4827184]   
 
-            self.data = [
-                {
-                    'loc' : torch.FloatTensor(size, 2).uniform_(0, 1),
-                    'demand' : torch.tensor(
-                        np.random.choice([1,2,3,4,5],size=size, 
-                                                replace=True, p=population) / CAPACITY,
-                        dtype = torch.float32),
-                    'depot' : torch.full(size=(2,),fill_value=0.5),
-                }
-            for i in range(num_samples)
-            ]
+            data=[]
+            for i in range(num_samples) :
+                # pop = np.random.uniform(size=(pop_size, 2))
+                # pop_demand = np.random.choice([1,2,3,4,5],size=pop_size, replace=True, p=pop_dist) 
+                # loc, _ , demand = cluster_pop(pop, size, pop_demand)
+                loc = np.random.uniform(size=(size,2))
+                demand = np.random.choice([1,2,3,4,5],size=pop_size, replace=True, p=pop_dist) 
+                data.append({
+                    'loc' : torch.tensor(loc , dtype=torch.float32),
+                    'demand' : torch.tensor(demand / CAPACITY, dtype = torch.float32),
+                    'depot': torch.FloatTensor(2).uniform_(0, 1),
+                })
+            
+            self.data = data
 
         self.size = len(self.data)
 
