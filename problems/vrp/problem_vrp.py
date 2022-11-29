@@ -137,17 +137,17 @@ class CVRP_BUS(CVRP):
         for i in range(pi.size(1)-1):
             if i==0:
                 continue
-            not_allocated = (z==0)
-            continuous_zero = torch.logical_and(pi[:,i]==pi[:,i+1], pi[:,i]==0)
+            not_allocated = (z==0).cuda()
+            continuous_zero = torch.logical_and(pi[:,i]==pi[:,i+1], pi[:,i]==0).cuda()
             z[torch.logical_and(continuous_zero,not_allocated)]=i
-        z[torch.logical_and(z==0,pi[:,-1]==0)]=pi.size(1)-1 
+        z[torch.logical_and((z==0).cuda(),(pi[:,-1]==0).cuda())]=pi.size(1)-1 
         z[z==0]=pi.size(1)
-        num_dummy_zeros = pi.size(1)-z
+        num_dummy_zeros = (pi.size(1)-z).cuda()
         # routes = [r[r!=0] for r in np.split(pi.cpu().numpy(), np.where(pi==0)[0]) if (r != 0).any()]
         
         # num_buses = len(routes)
-        num_zeros = (sorted_pi==0).sum(axis=1) # (batch_size,)
-        num_buses = num_zeros-num_dummy_zeros + 1
+        num_zeros = (sorted_pi==0).sum(axis=1).cuda() # (batch_size,)
+        num_buses = (num_zeros-num_dummy_zeros + 1).cuda()
         
         # print(pi[0])
         # print(cost_VRP[0])
@@ -156,7 +156,7 @@ class CVRP_BUS(CVRP):
         # some reasonable coefficient c balancing the cost of VRP length and the cost of # of buses.
         c=0.2
 
-        cost = (1-c)*cost_VRP + c*num_buses
+        cost = (1-c)*cost_VRP.cuda() + c*num_buses
         # print(cost[0])
         return cost, None
 
