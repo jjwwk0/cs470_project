@@ -34,7 +34,7 @@ python generate_data_cvrp_bus.py -f --graph_sizes 20
 For training our model instance with new objective function:
 
 ```bash
-python run.py —problem 'cvrp_bus'  —graph_size 20 —baseline rollout —run_name 'cvrp_bus_20_rollout'
+python run.py --problem 'cvrp_bus'  --graph_size 20 --baseline rollout --run_name 'cvrp_bus_20_rollout'
 ```
 
 The output will be saved on `outputs/cvrp_bus_20` directory.
