@@ -1,5 +1,5 @@
-# [CS470 Team 23] Solving SBRP with Attention Model
-
+# [CS470 Team 23] School Bus Routing Problem with Attention Model
+s
 We use attention model to solve SBRP considering number of routes. Taking number of routes (reprensenting the bus on SBRP) into account, we trained our own model instance with new objective function.
 
 Our implementatin is mainly on the `problems/vrp/problem_vrp.py` and the class `CVRP_BUS` inside it.
