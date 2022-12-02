@@ -28,7 +28,7 @@ To generate validation as used in result_team23.ipynb
 ```bash
 python generate_data_cvrp_bus.py -f --graph_sizes 20 
 ```
-
+Generated data will be saved as `data/cvrp_bus/cvrp_bus20_validation_seed1234.pkl`
 ### Training
 
 For training our model instance with new objective function:
