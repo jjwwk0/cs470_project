@@ -4,7 +4,7 @@ We use attention model to solve SBRP considering number of routes. Taking number
 
 Our implementatin is mainly on the `problems/vrp/problem_vrp.py` and the class `CVRP_BUS` inside it.
 We also implement more real-world like validation data generation on `generate_data_cvrp_bus.py`.
-Our train result is on `team23_model` directory which are used on `result.ipynb` (for epoch 99).
+Our train result is on `team23_model` directory which are used on `result_team23.ipynb` (for epoch 99).
 
 ![TITLE EXAMPLE](images/good1.png)
 
@@ -23,7 +23,7 @@ team23_env.yml
 ### Generating data
 
 Training data is generated on the fly. 
-To generate validation as used in result.ipynb
+To generate validation as used in result_team23.ipynb
 
 ```bash
 python generate_data_cvrp_bus.py -f --graph_sizes 20 
@@ -40,10 +40,10 @@ python run.py —problem 'cvrp_bus'  —graph_size 20 —baseline rollout —run
 The output will be saved on `outputs/cvrp_bus_20` directory.
 
 ### Evaluation of the model and Visualization
-See `result.ipynb` for an example of loading a pretrained model and plotting the result for Capacitated VRP with 20 nodes.
+See `result_team23.ipynb` for an example of loading a pretrained model and plotting the result for Capacitated VRP with 20 nodes.
 We compared our model with new objective functiona and previous pretrained model with naive distance objective on this jupyter notebook with 10000 validation data. 
 
-Below is the one of the comparisons. You can check the `result.ipynb` for more cases.
+Below is the one of the comparisons. You can check the `result_team23.ipynb` for more cases.
 ![comparison_example](images/good_github2.png)
 
 
