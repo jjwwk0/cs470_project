@@ -27,7 +27,7 @@ def generate_cvrp_bus_data_with_clustering(dataset_size, vrp_size):
     CAPACITY = 45
 
     #before clustering
-    pop_size=200
+    pop_size=100
     
     pop_dist = [1975132/4827184,2361745/4827184, 448404/4827184, 36683/4827184, 5220/4827184]    
     pop_demand = np.random.choice([1,2,3,4,5],size=pop_size, replace=True, p=pop_dist) 

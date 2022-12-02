@@ -260,6 +260,7 @@ class VRPDataset(Dataset):
             with open(filename, 'rb') as f:
                 data = pickle.load(f)
             self.data = [make_instance(args) for args in data[offset:offset+num_samples]]
+            print(self.data)
 
         else:
 
