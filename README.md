@@ -41,7 +41,7 @@ The output will be saved on `outputs/cvrp_bus_20` directory.
 
 ### Evaluation of the model and Visualization
 See `result_team23.ipynb` for an example of loading a pretrained model and plotting the result for Capacitated VRP with 20 nodes.
-We compared our model with new objective functiona and previous pretrained model with naive distance objective on this jupyter notebook with 10000 validation data. 
+We compared our model with new objective function and previous pretrained model with naive distance objective on this jupyter notebook with 10000 validation data. 
 
 Below is the one of the comparisons. You can check the `result_team23.ipynb` for more cases.
 ![comparison_example](images/good_github2.png)
