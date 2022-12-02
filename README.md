@@ -4,7 +4,7 @@ We use attention model to solve SBRP considering number of routes. Taking number
 
 Our implementatin is mainly on the `problems/vrp/problem_vrp.py` and the class `CVRP_BUS` inside it.
 We also implement more real-world like validation data generation on `generate_data_cvrp_bus.py`.
-Our train result is on `outputs/cvrp_bus_20/cvrp_bus_20_rollout_20221129T013408` and `joutputs/cvrp_bus_20/cvrp_bus_20_rollout_20221129T123036` which are used on `result.ipynb` (for epoch 99).
+Our train result is on `team23_model` directory which are used on `result.ipynb` (for epoch 99).
 
 ![TITLE EXAMPLE](images/good1.png)
 
@@ -56,4 +56,4 @@ python eval.py -h
 
 
 ## Acknowledgements
-Thanks to [outerkool/attention-learn-to-route](https://github.com/wouterkool/attention-learn-to-route) for making us to reproduce our product.
+Thanks to [wouterkool/attention-learn-to-route](https://github.com/wouterkool/attention-learn-to-route) for making us to reproduce our product.
