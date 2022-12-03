@@ -1,5 +1,5 @@
 # [CS470 Team 23] School Bus Routing Problem with Attention Model
-s
+
 We use attention model to solve SBRP considering number of routes. Taking number of routes (reprensenting the bus on SBRP) into account, we trained our own model instance with new objective function.
 
 Our implementatin is mainly on the `problems/vrp/problem_vrp.py` and the class `CVRP_BUS` inside it.
@@ -28,7 +28,7 @@ To generate validation as used in result_team23.ipynb
 ```bash
 python generate_data_cvrp_bus.py -f --graph_sizes 20 
 ```
-
+Generated data will be saved as `data/cvrp_bus/cvrp_bus20_validation_seed1234.pkl`
 ### Training
 
 For training our model instance with new objective function:
