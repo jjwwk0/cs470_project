@@ -1,4 +1,4 @@
-name: base
+name: attention_tsp
 channels:
   - gurobi
   - conda-forge
