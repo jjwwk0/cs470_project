@@ -12,12 +12,6 @@ Our train result is on `team23_model` directory which are used on `result_team23
 Most of code implementation is based on the source code from [repository](https://github.com/wouterkool/attention-learn-to-route) of the paper [Attention, Learn to Solve Routing Problems!](https://openreview.net/forum?id=ByxBFsRqYm) which has been accepted at [ICLR 2019](https://iclr.cc/Conferences/2019)
 
 
-## Dependencies
-
-```bash
-team23_env.yml
-```
-
 ## Usage
 
 ### Generating data
